@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Family Tree</title>
+    <title>2Family Tree</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -41,9 +41,9 @@
     <div id="tree-container"></div>
 
     <!-- Official cloud script library path -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <script src="https://cloudflare.com"></script>
     <script>
-        const margin = {top: 40, right: 90, bottom: 50, left: 120};
+        const margin = {top: 40, right: 90, bottom: 50, left: 150};
         const width = window.innerWidth - margin.left - margin.right;
         const height = window.innerHeight - margin.top - margin.bottom;
 
@@ -56,7 +56,9 @@
             .append("g");
 
         const g = svg.append("g");
-        const treemap = d3.tree().nodeSize(); 
+        
+        // FIX: Configure node sizes without breaking the functional layout pipeline
+        const treemap = d3.tree().nodeSize([40, 260]); 
 
         let root;
 
@@ -102,10 +104,12 @@
         });
 
         function update(source) {
+            // Evaluates safely now that treemap layout config is correct
             const treeData = treemap(root);
             const nodes = treeData.descendants();
             const links = treeData.links();
 
+            // Set generation horizontal branch depths cleanly
             nodes.forEach(d => d.y = d.depth * 260);
 
             const node = g.selectAll('g.node')

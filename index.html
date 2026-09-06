@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>D3.js Interactive Family Tree</title>
+    <title>Family Tree</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -76,41 +76,45 @@
             }
         }
 
-// 5. Fetch and load data (With Memory Persistence!)
-d3.json("data.json").then(data => {
-    root = d3.hierarchy(data, d => d.children);
-    
-    // Center the camera group nicely in the left-center window
-    g.attr("transform", `translate(${margin.left}, ${height / 2})`);
+        // 5. Fetch and load data
+        d3.json("data.json").then(data => {
+            root = d3.hierarchy(data, d => d.children);
+            
+            // FIX: Dynamic window tracking to force alignment on screen
+            const initialLeft = window.innerWidth > 600 ? 150 : 50;
+            const initialTop = window.innerHeight / 2;
+            
+            // Set the container position explicitly
+            g.attr("transform", `translate(${initialLeft}, ${initialTop})`);
 
-    root.x0 = 0;
-    root.y0 = 0;
+            // Seed initial animation variables
+            root.x0 = 0;
+            root.y0 = 0;
 
-    // Load saved collapsed states from localStorage memory
-    const savedCollapsed = JSON.parse(localStorage.getItem('collapsedNodes') || "[]");
+            // Load saved collapsed states from localStorage memory
+            const savedCollapsed = JSON.parse(localStorage.getItem('collapsedNodes') || "[]");
 
-    // Smart collapse function that checks your memory
-    function applySavedState(d) {
-        // If this person's name was saved as collapsed, or if it's past Gen 2 on a first-time load
-        const shouldCollapse = savedCollapsed.length > 0 
-            ? savedCollapsed.includes(d.data.name) 
-            : d.depth >= 1; // Default to collapse past generation 1 if no history exists
+            // Smart collapse function that checks your memory
+            function applySavedState(d) {
+                const shouldCollapse = savedCollapsed.length > 0 
+                    ? savedCollapsed.includes(d.data.name) 
+                    : d.depth >= 1; 
 
-        if (d.children) {
-            d.children.forEach(applySavedState);
-            if (shouldCollapse) {
-                d._children = d.children;
-                d.children = null;
+                if (d.children) {
+                    d.children.forEach(applySavedState);
+                    if (shouldCollapse) {
+                        d._children = d.children;
+                        d.children = null;
+                    }
+                }
             }
-        }
-    }
 
-    // Apply the saved state to your tree structure
-    applySavedState(root);
-    update(root);
-}).catch(error => {
-    console.error("Error loading the data.json file:", error);
-});
+            // Apply the saved state to your tree structure
+            applySavedState(root);
+            update(root);
+        }).catch(error => {
+            console.error("Error loading the data.json file:", error);
+        });
 
 
         // 6. The Core Update & Rendering Function

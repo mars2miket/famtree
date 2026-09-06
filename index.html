@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>1Family Tree</title>
+    <title>Family Tree</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,15 +40,13 @@
 
     <div id="tree-container"></div>
 
-    <!-- Clean, universal D3 global CDN script tag -->
-    <script src="https://cloudflare.com"></script>
+    <!-- Official cloud script library path -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
     <script>
-        // 1. Dimensions and Map Configuration
         const margin = {top: 40, right: 90, bottom: 50, left: 120};
         const width = window.innerWidth - margin.left - margin.right;
         const height = window.innerHeight - margin.top - margin.bottom;
 
-        // 2. Append SVG and apply Zoom/Pan behavior
         const svg = d3.select("#tree-container").append("svg")
             .attr("width", "100%")
             .attr("height", "100%")
@@ -57,15 +55,11 @@
             }))
             .append("g");
 
-        // This main group holds the tree layout
         const g = svg.append("g");
-
-        // 3. Initialize Tree Layout Creator with node sizes [vertical spacing, horizontal spacing]
         const treemap = d3.tree().nodeSize(); 
 
         let root;
 
-        // 4. Helper function to handle collapsing nodes
         function collapse(d) {
             if (d.children) {
                 d._children = d.children;
@@ -74,25 +68,19 @@
             }
         }
 
-        // 5. Fetch and load data
         d3.json("data.json").then(data => {
             root = d3.hierarchy(data, d => d.children);
             
-            // Dynamic window tracking to force alignment on screen
             const initialLeft = window.innerWidth > 600 ? 150 : 50;
             const initialTop = window.innerHeight / 2;
             
-            // Set the container position explicitly
             g.attr("transform", `translate(${initialLeft}, ${initialTop})`);
 
-            // Seed initial animation variables
             root.x0 = 0;
             root.y0 = 0;
 
-            // Load saved collapsed states from localStorage memory
             const savedCollapsed = JSON.parse(localStorage.getItem('collapsedNodes') || "[]");
 
-            // Smart collapse function that checks your memory
             function applySavedState(d) {
                 const shouldCollapse = savedCollapsed.length > 0 
                     ? savedCollapsed.includes(d.data.name) 
@@ -107,29 +95,22 @@
                 }
             }
 
-            // Apply the saved state to your tree structure
             applySavedState(root);
             update(root);
         }).catch(error => {
             console.error("Error loading the data.json file:", error);
         });
 
-        // 6. The Core Update & Rendering Function
         function update(source) {
             const treeData = treemap(root);
-
-            // Compute the new tree layout
             const nodes = treeData.descendants();
             const links = treeData.links();
 
-            // Normalize for fixed-depth generation sizing
             nodes.forEach(d => d.y = d.depth * 260);
 
-            // --- NODES SELECTION ---
             const node = g.selectAll('g.node')
                 .data(nodes, d => d.id || (d.id = Math.random().toString(36)));
 
-            // Enter any new nodes at the parent's previous position
             const nodeEnter = node.enter().append('g')
                 .attr('class', 'node')
                 .attr('transform', d => `translate(${source.y0},${source.x0})`)
@@ -142,7 +123,6 @@
                         d._children = null;
                     }
                     
-                    // --- SAVE CURRENT STATE TO STORAGE ---
                     const collapsedNames = [];
                     root.descendants().forEach(node => {
                         if (node._children) {
@@ -154,13 +134,11 @@
                     update(d);
                 });
 
-            // Add Anchor Circles for Nodes
             nodeEnter.append('circle')
                 .attr('class', 'node')
                 .attr('r', 6)
                 .style("fill", d => d._children ? "#4b6cb7" : "#fff");
 
-            // Add Label for Primary Person
             nodeEnter.append('text')
                 .attr("dy", "-4")
                 .attr("x", d => d.children || d._children ? -15 : 15)
@@ -168,7 +146,6 @@
                 .text(d => d.data.name)
                 .style("font-weight", "bold");
 
-            // Add Label for Spouse and Ex-Spouse status combinations
             nodeEnter.append('text')
                 .attr("class", "spouse-text")
                 .attr("dy", "12")
@@ -188,7 +165,6 @@
                     return "";
                 });
 
-            // UPDATE transitions existing nodes to their new coordinates
             const nodeUpdate = nodeEnter.merge(node);
             nodeUpdate.transition()
                 .duration(400)
@@ -198,17 +174,14 @@
                 .attr('r', 6)
                 .style("fill", d => d._children ? "#4b6cb7" : "#fff");
 
-            // Remove any exiting nodes
             const nodeExit = node.exit().transition()
                 .duration(400)
                 .attr('transform', d => `translate(${source.y},${source.x})`)
                 .remove();
 
-            // --- LINKS (CONNECTIONS) SELECTION ---
             const link = g.selectAll('path.link')
                 .data(links, d => d.target.id);
 
-            // Enter any new links at the parent's previous position
             const linkEnter = link.enter().insert('path', "g")
                 .attr('class', 'link')
                 .attr('d', d => {
@@ -216,13 +189,11 @@
                     return diagonalCurve(o, o);
                 });
 
-            // Update links with smooth cubic Bezier curves
             const linkUpdate = linkEnter.merge(link);
             linkUpdate.transition()
                 .duration(400)
                 .attr('d', d => diagonalCurve(d.source, d.target));
 
-            // Remove exiting links
             link.exit().transition()
                 .duration(400)
                 .attr('d', d => {
@@ -231,14 +202,12 @@
                 })
                 .remove();
 
-            // Store old positions for smooth transition seeds
             nodes.forEach(d => {
                 d.x0 = d.x;
                 d.y0 = d.y;
             });
         }
 
-        // Cubic Bezier path generator for beautiful curved lines
         function diagonalCurve(s, d) {
             return `M ${s.y} ${s.x}
                     C ${(s.y + d.y) / 2} ${s.x},

@@ -1,0 +1,120 @@
+{
+  "name": "Hien Tran",
+  "spouse": "Xuyen Ha",
+  "children": [
+
+    {
+      "name": "Chau",
+      "spouse": "Phung",
+      "children": [
+        { "name": "Vinh", "spouse": "Jen", "children": [{ "name": "Donte" }] },
+        { 
+          "name": "Hanh", 
+          "spouse": "Warren", 
+          "children": [
+            { "name": "Aaron" },
+            { "name": "Christian" },
+            { "name": "Desmond" },
+            { "name": "Amiah" }
+          ]
+        },
+        { 
+          "name": "Vu", 
+          "exSpouse": "Vanessa",
+          "children": [{ "name": "Linda Natalie" }] 
+        },
+        { 
+          "name": "Joseph", 
+          "spouse": null,
+          "exSpouse": "Truc",
+          "children": [{ "name": "Elliot" }] 
+        }
+      ]
+    },
+    {
+      "name": "Thuy",
+      "exSpouse": "Tam",
+      "children": [
+        { 
+          "name": "Nancy", 
+          "spouse": "Thomas", 
+          "children": [
+            { "name": "Tiana" },
+            { "name": "Aliyah" },
+            { "name": "Kai" }
+          ]
+        },
+        { "name": "Fenton" },
+        { 
+          "name": "Francis", 
+          "spouse": null,
+          "exSpouse": "Cita",
+          "children": [
+            { "name": "Lucas" },
+            { "name": "Mayla" }
+          ]
+        },
+        { "name": "Nicole" },
+        { "name": "Naomi" },
+        { 
+          "name": "Franco", 
+          "spouse": "Deana", 
+          "children": [
+            { "name": "Rosalie" },
+            { "name": "Nicholas" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Twee",
+      "spouse": "Tony",
+      "children": [
+        { "name": "Thang", "spouse": "Yessenia" },
+        { "name": "Phi", "spouse": "Rene" }
+      ]
+    },
+    {
+      "name": "Linh",
+      "spouse": "Bowdy",
+      "children": [
+        { "name": "Ybinh", "spouse": "Mike" },
+        { "name": "Yvan" },
+        { "name": "Sam" },
+        { "name": "Daniel" },
+        { "name": "Nathaniel" }
+      ]
+    },
+    {
+      "name": "Jen",
+      "spouse": "Art",
+      "children": [
+        { "name": "Hannah" },
+        { "name": "Matt" },
+        { "name": "Jake", "spouse": "Chloe" }
+      ]
+    },
+    {
+      "name": "Tom",
+      "children": [
+        { "name": "Vivan" }
+      ]
+    },
+    {
+      "name": "Mike",
+      "children": [
+        { 
+          "name": "Madalyn", 
+          "spouse": "Eric", 
+          "children": [
+            { "name": "Case Scott Knutson" },
+            { "name": "Cole Michael Knutson" }
+          ]
+        }
+      ]
+    },
+    { 
+      "name": "Adam (Son of Hien Tran only)"
+    }
+  ]
+}

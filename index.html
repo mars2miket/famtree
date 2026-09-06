@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Family Tree</title>
+    <title>zFamily Tree</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,15 +40,15 @@
 
     <div id="tree-container"></div>
 
-    <!-- Official cloud script library path -->
-    <script src="https://cloudflare.com"></script>
-    <script src="https://jsdelivr.net"></script>
-    <script src="d3.v7.min.js"></script>
+    <!-- Local repository script link to bypass security barriers -->
+    <script src="./d3.min.js"></script>
     <script>
+        // 1. Dimensions and Map Configuration
         const margin = {top: 40, right: 90, bottom: 50, left: 150};
         const width = window.innerWidth - margin.left - margin.right;
         const height = window.innerHeight - margin.top - margin.bottom;
 
+        // 2. Append SVG and apply Zoom/Pan behavior
         const svg = d3.select("#tree-container").append("svg")
             .attr("width", "100%")
             .attr("height", "100%")
@@ -57,13 +57,15 @@
             }))
             .append("g");
 
+        // This main group holds the tree layout
         const g = svg.append("g");
         
-        // FIX: Configure node sizes without breaking the functional layout pipeline
-        const treemap = d3.tree().nodeSize([40, 260]); 
+        // 3. Initialize Tree Layout Creator
+        const treemap = d3.tree().nodeSize(); 
 
         let root;
 
+        // 4. Helper function to handle collapsing nodes (Restored!)
         function collapse(d) {
             if (d.children) {
                 d._children = d.children;
@@ -72,6 +74,7 @@
             }
         }
 
+        // 5. Fetch and load data
         d3.json("data.json").then(data => {
             root = d3.hierarchy(data, d => d.children);
             
@@ -100,13 +103,18 @@
             }
 
             applySavedState(root);
-            update(root);
+            
+            // SPEED OPTIMIZATION: Pass 'true' to skip initial sliding animations
+            update(root, true);
         }).catch(error => {
             console.error("Error loading the data.json file:", error);
         });
 
-        function update(source) {
-            // Evaluates safely now that treemap layout config is correct
+        // 6. The Core Update & Rendering Function (Accepts speed optimizer flag)
+        function update(source, isInitialLoad = false) {
+            // Drop transitions to 0ms on first boot so it loads instantly
+            const transitionDuration = isInitialLoad ? 0 : 400;
+
             const treeData = treemap(root);
             const nodes = treeData.descendants();
             const links = treeData.links();
@@ -119,7 +127,8 @@
 
             const nodeEnter = node.enter().append('g')
                 .attr('class', 'node')
-                .attr('transform', d => `translate(${source.y0},${source.x0})`)
+                // Force positioning directly if loading initially to skip the sliding animation
+                .attr('transform', d => isInitialLoad ? `translate(${d.y},${d.x})` : `translate(${source.y0},${source.x0})`)
                 .on('click', (event, d) => {
                     if (d.children) {
                         d._children = d.children;
@@ -137,7 +146,7 @@
                     });
                     localStorage.setItem('collapsedNodes', JSON.stringify(collapsedNames));
                     
-                    update(d);
+                    update(d); // Active user clicks keep their smooth transitions
                 });
 
             nodeEnter.append('circle')
@@ -173,7 +182,7 @@
 
             const nodeUpdate = nodeEnter.merge(node);
             nodeUpdate.transition()
-                .duration(400)
+                .duration(transitionDuration)
                 .attr('transform', d => `translate(${d.y},${d.x})`);
 
             nodeUpdate.select('circle.node')
@@ -181,7 +190,7 @@
                 .style("fill", d => d._children ? "#4b6cb7" : "#fff");
 
             const nodeExit = node.exit().transition()
-                .duration(400)
+                .duration(transitionDuration)
                 .attr('transform', d => `translate(${source.y},${source.x})`)
                 .remove();
 
@@ -191,17 +200,17 @@
             const linkEnter = link.enter().insert('path', "g")
                 .attr('class', 'link')
                 .attr('d', d => {
-                    const o = {x: source.x0, y: source.y0};
+                    const o = isInitialLoad ? {x: d.target.x, y: d.target.y} : {x: source.x0, y: source.y0};
                     return diagonalCurve(o, o);
                 });
 
             const linkUpdate = linkEnter.merge(link);
             linkUpdate.transition()
-                .duration(400)
+                .duration(transitionDuration)
                 .attr('d', d => diagonalCurve(d.source, d.target));
 
             link.exit().transition()
-                .duration(400)
+                .duration(transitionDuration)
                 .attr('d', d => {
                     const o = {x: source.x, y: source.y};
                     return diagonalCurve(o, o);

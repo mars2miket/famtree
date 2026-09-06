@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Family Tree</title>
-    <script src="https://cloudflare.com"></script>
+    <title>1Family Tree</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -41,10 +40,8 @@
 
     <div id="tree-container"></div>
 
-    <!-- Node modules local npm path to satisfy CSP rules -->
-    <!-- Automatically uses your local npm file, falls back to web CDN if hosted on GitHub Pages -->
-<script src="./node_modules/d3/dist/d3.min.js" onerror="this.src='https://cloudflare.com'"></script>
-
+    <!-- Clean, universal D3 global CDN script tag -->
+    <script src="https://cloudflare.com"></script>
     <script>
         // 1. Dimensions and Map Configuration
         const margin = {top: 40, right: 90, bottom: 50, left: 120};
@@ -64,7 +61,7 @@
         const g = svg.append("g");
 
         // 3. Initialize Tree Layout Creator with node sizes [vertical spacing, horizontal spacing]
-        const treemap = d3.tree().nodeSize([45, 240]); 
+        const treemap = d3.tree().nodeSize(); 
 
         let root;
 
@@ -81,7 +78,7 @@
         d3.json("data.json").then(data => {
             root = d3.hierarchy(data, d => d.children);
             
-            // FIX: Dynamic window tracking to force alignment on screen
+            // Dynamic window tracking to force alignment on screen
             const initialLeft = window.innerWidth > 600 ? 150 : 50;
             const initialTop = window.innerHeight / 2;
             
@@ -117,7 +114,6 @@
             console.error("Error loading the data.json file:", error);
         });
 
-
         // 6. The Core Update & Rendering Function
         function update(source) {
             const treeData = treemap(root);
@@ -133,34 +129,30 @@
             const node = g.selectAll('g.node')
                 .data(nodes, d => d.id || (d.id = Math.random().toString(36)));
 
-    // Enter any new nodes at the parent's previous position
-    const nodeEnter = node.enter().append('g')
-        .attr('class', 'node')
-        .attr('transform', d => `translate(${source.y0},${source.x0})`)
-        .on('click', (event, d) => {
-            // Toggle the collapse state
-            if (d.children) {
-                d._children = d.children;
-                d.children = null;
-            } else {
-                d.children = d._children;
-                d._children = null;
-            }
-            
-            // --- SAVE CURRENT STATE TO STORAGE ---
-            const collapsedNames = [];
-            // Find all nodes that are currently collapsed on your screen
-            root.descendants().forEach(node => {
-                if (node._children) {
-                    collapsedNames.push(node.data.name);
-                }
-            });
-            // Save the list into browser memory
-            localStorage.setItem('collapsedNodes', JSON.stringify(collapsedNames));
-            
-            update(d);
-        });
-
+            // Enter any new nodes at the parent's previous position
+            const nodeEnter = node.enter().append('g')
+                .attr('class', 'node')
+                .attr('transform', d => `translate(${source.y0},${source.x0})`)
+                .on('click', (event, d) => {
+                    if (d.children) {
+                        d._children = d.children;
+                        d.children = null;
+                    } else {
+                        d.children = d._children;
+                        d._children = null;
+                    }
+                    
+                    // --- SAVE CURRENT STATE TO STORAGE ---
+                    const collapsedNames = [];
+                    root.descendants().forEach(node => {
+                        if (node._children) {
+                            collapsedNames.push(node.data.name);
+                        }
+                    });
+                    localStorage.setItem('collapsedNodes', JSON.stringify(collapsedNames));
+                    
+                    update(d);
+                });
 
             // Add Anchor Circles for Nodes
             nodeEnter.append('circle')

@@ -19,9 +19,10 @@
           ]
         },
         { 
-          "name": "Vu", 
-          "exSpouse": "Vanessa",
-          "children": [{ "name": "Linda Natalie" }] 
+          "name": "Vu",
+          "spouse": "Vanessa", 
+          "exSpouse": "Linda",
+          "children": [{ "name": "Natalie" }] 
         },
         { 
           "name": "Joseph", 
@@ -39,7 +40,8 @@
           "name": "Nancy", 
           "spouse": "Thomas", 
           "children": [
-            { "name": "Tiana" },
+            { "name": "Tiana",
+            "spouse": "Havi" }, 
             { "name": "Aliyah" },
             { "name": "Kai" }
           ]

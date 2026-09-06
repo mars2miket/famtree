@@ -109,14 +109,14 @@
           "name": "Madalyn", 
           "spouse": "Eric", 
           "children": [
-            { "name": "Case Scott Knutson" },
-            { "name": "Cole Michael Knutson" }
+            { "name": "Case" },
+            { "name": "Cole" }
           ]
         }
       ]
     },
     { 
-      "name": "Adam (Son of Hien Tran only)"
+      "name": "Adam (half-ling lol)"
     }
   ]
 }
